@@ -9,13 +9,32 @@ import css from './App.module.css'
 
 class App extends Component {
 	state = {
-		contacts: [
-			{id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
-			{id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
-			{id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
-			{id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
-		],
+		contacts: [],
 		filter: ''
+	}
+	
+	componentDidMount() {
+		const localData = localStorage.getItem('contacts');
+
+		if (localData && JSON.parse(localData).length > 0) {
+			this.setState({
+				contacts: JSON.parse(localData),
+			})
+		}
+		else {
+			this.setState({
+				contacts: [
+					{id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
+					{id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
+					{id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
+					{id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
+				],
+			})
+		}
+	}
+
+	componentDidUpdate() {
+		localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
 	}
 
 	createContact = (name, number) => {
@@ -29,11 +48,10 @@ class App extends Component {
 		if (isDuplicated) {
 			return alert(`${name} is already in contacts.`)
 		}
-		
-		
+			
 		this.setState((prev) => ({
-			contacts: [...prev.contacts, newContact],
-		}))
+			contacts: [...prev.contacts, newContact]})
+		)
 	}
 
 	filterContact = (value) => { 
@@ -47,19 +65,20 @@ class App extends Component {
 		this.state.contacts.splice(index, 1);
 
 		this.setState(() => ({
-			contacts: this.state.contacts,
-		}))
+			contacts: this.state.contacts})
+		)
     }
 	
 	render() {
+		const {  contacts, filter } = this.state;
 		return (
 			<div className={css.wrapper}>
 				<h1>Phonebook</h1>
 				<ContactForm createContact={this.createContact} />
 
 				<h2>Contacts</h2>
-				<Filter filterContact={this.filterContact} contacts={this.state.contacts}/>
-				<ContactList contacts={this.state.contacts} filter={this.state.filter} toDeleteContact={this.toDeleteContact} />
+				<Filter filterContact={this.filterContact} contacts={contacts} />
+				<ContactList contacts={contacts} filter={filter} toDeleteContact={this.toDeleteContact} />
 			</div>
 		)
 	}
